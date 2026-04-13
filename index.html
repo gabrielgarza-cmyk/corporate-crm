@@ -8,14 +8,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --purple: #7F77DD; --purple-lt: #EEEDFE; --purple-dk: #534AB7;
+    --purple: #0066FF; --purple-lt: #E0EEFF; --purple-dk: #0047CC;
     --teal: #1D9E75;   --teal-lt: #E1F5EE;   --teal-dk: #0F6E56;
     --amber: #BA7517;  --amber-lt: #FAEEDA;
     --red: #A32D2D;    --red-lt: #FCEBEB;
-    --blue: #185FA5;   --blue-lt: #E6F1FB;
+    --blue: #0047CC;   --blue-lt: #E0EEFF;
     --gray: #5F5E5A;   --gray-lt: #F1EFE8;   --gray-dk: #2C2C2A;
-    --bg: #F7F6F3; --surface: #FFFFFF; --border: rgba(0,0,0,0.09);
-    --text: #1a1918; --text-2: #6B6A66; --text-3: #9E9D99;
+    --bg: #F5F7FA; --surface: #FFFFFF; --border: rgba(0,0,0,0.09);
+    --text: #0D1117; --text-2: #6B6A66; --text-3: #9E9D99;
     --radius: 10px; --radius-lg: 14px;
     --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
   }
@@ -65,9 +65,9 @@
   /* ── BADGES ── */
   .badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 500; display: inline-block; }
   .b-won  { background: var(--teal-lt);   color: var(--teal-dk); }
-  .b-neg  { background: var(--purple-lt); color: var(--purple-dk); }
+  .b-neg  { background: var(--blue-lt); color: var(--blue); }
   .b-prop { background: var(--amber-lt);  color: var(--amber); }
-  .b-disc { background: var(--blue-lt);   color: var(--blue); }
+  .b-disc { background: #E0EEFF;   color: #0047CC; }
   .b-pros { background: var(--gray-lt);   color: var(--gray); }
   .b-verb { background: var(--red-lt);    color: var(--red); }
   .b-lost { background: #f7c1c1;          color: #501313; }
@@ -97,7 +97,7 @@
   .tbl tr:hover td { background: var(--bg); }
   .tbl tr:last-child td { border-bottom: none; }
   .av { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; flex-shrink: 0; }
-  .av-d { background: var(--purple-lt); color: var(--purple-dk); }
+  .av-d { background: var(--blue-lt); color: var(--blue); }
   .av-m { background: var(--teal-lt);   color: var(--teal-dk); }
 
   /* ── TASKS ── */
@@ -160,6 +160,22 @@
   .detail-label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
   .detail-val { font-size: 13px; color: var(--text); }
 
+  /* ── NOTAS ── */
+  .nota-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .nota-item:last-child { border: none; }
+  .nota-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .nota-body { flex: 1; }
+  .nota-txt { font-size: 12.5px; color: var(--text); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .nota-meta { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+  .nota-input-wrap { display: flex; gap: 8px; margin-top: 10px; align-items: flex-end; }
+  .nota-input { flex: 1; padding: 8px 11px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 12.5px; color: var(--text); font-family: var(--font); background: var(--bg); outline: none; resize: none; min-height: 60px; max-height: 120px; transition: border-color .15s; }
+  .nota-input:focus { border-color: var(--purple); background: var(--surface); }
+  .nota-section { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 14px; }
+  .nota-section-hdr { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .nota-empty { font-size: 12px; color: var(--text-3); padding: 16px 0; text-align: center; }
+  .nota-delete { background: none; border: none; cursor: pointer; color: var(--text-3); font-size: 14px; padding: 0 4px; line-height: 1; transition: color .15s; flex-shrink: 0; }
+  .nota-delete:hover { color: var(--red); }
+
   /* scrollbar */
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -181,7 +197,7 @@
     <div class="nav" onclick="go('analytics',this)"><span class="nav-ic">▲</span> Analytics</div>
     <div class="sb-sec">Agente</div>
     <button class="agent-btn sel" onclick="setAgent('all',this)"><span class="agent-dot" style="background:#888780"></span>Todos</button>
-    <button class="agent-btn" onclick="setAgent('diego',this)"><span class="agent-dot" style="background:#7F77DD"></span>Diego V.</button>
+    <button class="agent-btn" onclick="setAgent('diego',this)"><span class="agent-dot" style="background:#0066FF"></span>Diego V.</button>
     <button class="agent-btn" onclick="setAgent('mauricio',this)"><span class="agent-dot" style="background:#1D9E75"></span>Mauricio B.</button>
   </div>
 
@@ -300,25 +316,28 @@ const SLABELS = {Prospecting:'Prospecto',Discovery:'Discovery',Proposal:'Propues
 const SCOLORS = {Prospecting:'#888780',Discovery:'#185FA5',Proposal:'#BA7517',Negotiation:'#534AB7','Verbal Commit':'#A32D2D',WON:'#1D9E75',LOST:'#888780'};
 const SBADGE  = {Prospecting:'b-pros',Discovery:'b-disc',Proposal:'b-prop',Negotiation:'b-neg','Verbal Commit':'b-verb',WON:'b-won',LOST:'b-lost'};
 
-let DB = { deals:[], agentes:[], tareas:[], actividades:[] };
+let DB = { deals:[], agentes:[], tareas:[], actividades:[], notas:[] };
 let curView = 'dashboard', curAgent = 'all', editingDealId = null;
 
 function fmt(n){ if(!n||n==0)return'—'; if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M'; if(n>=1000)return'$'+(n/1000).toFixed(0)+'K'; return'$'+n.toLocaleString(); }
 function fmtDate(d){ if(!d)return'—'; return new Date(d+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'}); }
+function fmtDateTime(d){ if(!d)return'—'; const dt=new Date(d); return dt.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}); }
 function toast(msg,ok=true){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'; t.style.background=ok?'#2C2C2A':'#A32D2D'; setTimeout(()=>t.className='toast',2500); }
 
 async function loadData(){
   try {
-    const [d,a,t,ac] = await Promise.all([
+    const [d,a,t,ac,n] = await Promise.all([
       sb.from('deals').select('*, empresas(*), agentes(*)').order('created_at',{ascending:false}),
       sb.from('agentes').select('*'),
       sb.from('tareas').select('*, agentes(*)').order('fecha_vencimiento'),
       sb.from('actividades').select('*, agentes(*), deals(*, empresas(*))').order('fecha',{ascending:false}).limit(50),
+      sb.from('notas').select('*, agentes(*)').order('created_at',{ascending:false}),
     ]);
     DB.deals      = d.data || [];
     DB.agentes    = a.data || [];
     DB.tareas     = t.data || [];
     DB.actividades= ac.data|| [];
+    DB.notas      = n.data || [];
     populateSelects();
     render();
   } catch(e){ document.getElementById('content').innerHTML=`<div class="empty">Error cargando datos: ${e.message}</div>`; }
@@ -348,7 +367,7 @@ function filtered(){
   });
 }
 
-function agentColor(id){ return id==='a1000000-0000-0000-0000-000000000001'?'#7F77DD':'#1D9E75'; }
+function agentColor(id){ return id==='a1000000-0000-0000-0000-000000000001'?'#0066FF':'#1D9E75'; }
 function agentInitials(id){ return id==='a1000000-0000-0000-0000-000000000001'?'DV':'MB'; }
 function agentClass(id){ return id==='a1000000-0000-0000-0000-000000000001'?'av-d':'av-m'; }
 
@@ -462,7 +481,7 @@ function renderPipeline(deals){
     </div>
     <div class="pipeline">${cols}</div>
     <div style="display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--text-3);align-items:center">
-      <span style="width:7px;height:7px;border-radius:50%;background:#7F77DD;display:inline-block"></span>Diego V.
+      <span style="width:7px;height:7px;border-radius:50%;background:#0066FF;display:inline-block"></span>Diego V.
       <span style="width:7px;height:7px;border-radius:50%;background:#1D9E75;display:inline-block;margin-left:6px"></span>Mauricio B.
     </div>`;
 }
@@ -563,7 +582,7 @@ function renderAnalytics(deals){
   document.getElementById('content').innerHTML=`
     <div class="two-col" style="margin-bottom:12px">
       ${agentCard('Mauricio Bernaldez',mDeals,'var(--teal)','av-m')}
-      ${agentCard('Diego Villanueva',dDeals,'var(--purple)','av-d')}
+      ${agentCard('Diego Villanueva',dDeals,'var(--blue)','av-d')}
     </div>
     <div class="card"><div class="card-hdr"><div class="card-title">Top industrias</div></div>${indRows||'<div class="empty">Sin datos</div>'}</div>`;
 }
@@ -647,19 +666,79 @@ async function saveActivity(){
   } catch(e){ toast('Error: '+e.message,false); }
 }
 
+/* ── NOTAS ── */
+async function saveNota(dealId){
+  const textarea = document.getElementById('nota-input-'+dealId);
+  const contenido = textarea.value.trim();
+  if(!contenido){ toast('Escribe algo primero',false); return; }
+  const agente_id = DB.agentes[0]?.id; // default primer agente — pueden cambiar después
+  try {
+    await sb.from('notas').insert({ deal_id: dealId, agente_id, contenido });
+    toast('Nota guardada');
+    textarea.value = '';
+    // recargar notas del deal y actualizar sección sin cerrar modal
+    const {data} = await sb.from('notas').select('*, agentes(*)').eq('deal_id', dealId).order('created_at', {ascending: false});
+    DB.notas = [...DB.notas.filter(n=>n.deal_id!==dealId), ...(data||[])];
+    renderNotasSection(dealId);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+async function deleteNota(notaId, dealId){
+  try {
+    await sb.from('notas').delete().eq('id', notaId);
+    DB.notas = DB.notas.filter(n=>n.id!==notaId);
+    toast('Nota eliminada');
+    renderNotasSection(dealId);
+  } catch(e){ toast('Error: '+e.message,false); }
+}
+
+function renderNotasSection(dealId){
+  const container = document.getElementById('notas-list-'+dealId);
+  if(!container) return;
+  const notas = DB.notas.filter(n=>n.deal_id===dealId).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  if(!notas.length){
+    container.innerHTML='<div class="nota-empty">Sin notas aún. Escribe la primera abajo.</div>';
+    return;
+  }
+  container.innerHTML = notas.map(n=>`
+    <div class="nota-item">
+      <div class="nota-av ${agentClass(n.agente_id)}">${agentInitials(n.agente_id)}</div>
+      <div class="nota-body">
+        <div class="nota-txt">${escapeHtml(n.contenido)}</div>
+        <div class="nota-meta">${n.agentes?.nombre||''} ${n.agentes?.apellido||''} · ${fmtDateTime(n.created_at)}</div>
+      </div>
+      <button class="nota-delete" onclick="deleteNota('${n.id}','${dealId}')" title="Eliminar nota">×</button>
+    </div>`).join('');
+}
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function handleNotaKeydown(e, dealId){
+  if(e.key==='Enter' && (e.metaKey||e.ctrlKey)){ e.preventDefault(); saveNota(dealId); }
+}
+
+/* ── DEAL DETAIL ── */
 function openDealDetail(id){
   const d=DB.deals.find(x=>x.id===id); if(!d)return;
   const ag=d.agentes;
+  const notasCount = DB.notas.filter(n=>n.deal_id===id).length;
+
   document.getElementById('content').insertAdjacentHTML('afterend',`
     <div class="modal-bg open detail-modal" id="detail-modal" onclick="if(event.target.id==='detail-modal')closeModal('detail-modal')">
-      <div class="modal" style="width:520px">
+      <div class="modal" style="width:560px;max-height:88vh">
         <div class="modal-hdr">
           <div style="display:flex;align-items:center;gap:10px">
             <div class="av ${agentClass(d.agente_id)}" style="width:34px;height:34px;font-size:11px">${agentInitials(d.agente_id)}</div>
-            <div><div class="modal-title">${d.empresas?.nombre||'—'}</div><div style="font-size:11px;color:var(--text-2)">${d.empresas?.industria||''}</div></div>
+            <div>
+              <div class="modal-title">${d.empresas?.nombre||'—'}</div>
+              <div style="font-size:11px;color:var(--text-2)">${d.empresas?.industria||''}</div>
+            </div>
           </div>
           <button class="close-btn" onclick="closeModal('detail-modal')">×</button>
         </div>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
           <div><div class="detail-label">Contacto</div><div class="detail-val">${d.empresas?.contacto||'—'}</div></div>
           <div><div class="detail-label">Servicio</div><div class="detail-val">${d.servicio||'—'}</div></div>
@@ -670,13 +749,35 @@ function openDealDetail(id){
           <div><div class="detail-label">Primer contacto</div><div class="detail-val">${fmtDate(d.fecha_primer_contacto)}</div></div>
           <div><div class="detail-label">Cierre estimado</div><div class="detail-val">${fmtDate(d.fecha_cierre_estimada)}</div></div>
         </div>
+
         ${d.siguiente_paso?`<div style="margin-bottom:14px"><div class="detail-label">Siguiente paso</div><div class="detail-val">${d.siguiente_paso}</div></div>`:''}
-        <div class="modal-actions">
+
+        <!-- SECCIÓN NOTAS -->
+        <div class="nota-section">
+          <div class="nota-section-hdr">
+            <span>📝 Notas <span style="font-weight:400;color:var(--text-3)">(${notasCount})</span></span>
+          </div>
+          <div id="notas-list-${id}"></div>
+          <div class="nota-input-wrap">
+            <textarea
+              class="nota-input"
+              id="nota-input-${id}"
+              placeholder="Escribe una nota... (Ctrl+Enter para guardar)"
+              onkeydown="handleNotaKeydown(event,'${id}')"
+            ></textarea>
+            <button class="btn btn-p btn-sm" style="height:fit-content;padding:8px 12px" onclick="saveNota('${id}')">Guardar</button>
+          </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top:14px">
           <button class="btn" onclick="closeModal('detail-modal')">Cerrar</button>
           <button class="btn btn-p" onclick="closeModal('detail-modal');openEditDeal('${d.id}')">Editar deal</button>
         </div>
       </div>
     </div>`);
+
+  // renderizar notas inmediatamente
+  renderNotasSection(id);
 }
 
 function closeModal(id){ const el=document.getElementById(id); if(el){el.classList.remove('open');if(id==='detail-modal')el.remove();} }
