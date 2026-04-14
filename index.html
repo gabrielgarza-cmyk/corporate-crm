@@ -421,8 +421,13 @@ function renderDashboard(deals){
   const active=deals.filter(d=>['Proposal','Negotiation','Verbal Commit'].includes(d.stage)).length;
   const conv=deals.length?Math.round(won/deals.length*100):0;
 
-  // ── ALERTAS: deals en rojo (todos los deals, no solo filtrados)
-  const dealsRojos = DB.deals.filter(d=>{
+  // ── ALERTAS: deals en rojo filtrados por agente activo
+  const dealsBase = curAgent==='all' ? DB.deals :
+    DB.deals.filter(d=> curAgent==='diego'
+      ? d.agente_id==='a1000000-0000-0000-0000-000000000001'
+      : d.agente_id==='a1000000-0000-0000-0000-000000000002');
+
+  const dealsRojos = dealsBase.filter(d=>{
     if(['WON','LOST'].includes(d.stage)) return false;
     const dias = diasEnStage(d);
     if(dias===null) return false;
