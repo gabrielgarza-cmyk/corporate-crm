@@ -421,6 +421,35 @@ function renderDashboard(deals){
   const active=deals.filter(d=>['Proposal','Negotiation','Verbal Commit'].includes(d.stage)).length;
   const conv=deals.length?Math.round(won/deals.length*100):0;
 
+  // ── ALERTAS: deals en rojo (todos los deals, no solo filtrados)
+  const dealsRojos = DB.deals.filter(d=>{
+    if(['WON','LOST'].includes(d.stage)) return false;
+    const dias = diasEnStage(d);
+    if(dias===null) return false;
+    return dias >= (STAGE_LIMITS[d.stage]||14);
+  }).sort((a,b)=>diasEnStage(b)-diasEnStage(a));
+
+  const alertasHTML = dealsRojos.length ? `
+    <div style="background:#FFF5F5;border:1.5px solid #F5C6C6;border-radius:var(--radius-lg);padding:14px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:15px">⚠️</span>
+        <span style="font-size:13px;font-weight:700;color:#A32D2D">${dealsRojos.length} deal${dealsRojos.length>1?'s':''} requieren atención</span>
+      </div>
+      ${dealsRojos.map(d=>{
+        const dias=diasEnStage(d);
+        const agNombre=d.agentes?.nombre||'';
+        const agColor=agentColor(d.agente_id);
+        return`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F5C6C6">
+          <span style="width:7px;height:7px;border-radius:50%;background:${agColor};flex-shrink:0;display:inline-block"></span>
+          <span style="font-weight:600;flex:1;font-size:12px">${d.empresas?.nombre||'—'}</span>
+          <span class="badge ${SBADGE[d.stage]}">${SLABELS[d.stage]}</span>
+          <span style="font-size:11px;font-weight:700;color:#A32D2D;min-width:50px;text-align:right">⏱ ${dias} días</span>
+          <span style="font-size:11px;color:var(--text-3);min-width:60px;text-align:right">${agNombre}</span>
+          <button class="btn btn-sm" style="font-size:10px;padding:3px 8px" onclick="closeModal('detail-modal');openDealDetail('${d.id}')">Ver</button>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
   const stageCounts={};STAGES.forEach(s=>stageCounts[s]=deals.filter(d=>d.stage===s).length);
   const stageRows=STAGES.filter(s=>s!=='LOST').map(s=>{
     const cnt=stageCounts[s]||0; const pct=deals.length?Math.round(cnt/deals.length*100):0;
@@ -444,6 +473,7 @@ function renderDashboard(deals){
     </div>`).join('') || '<div class="empty">Sin actividades</div>';
 
   document.getElementById('content').innerHTML=`
+    ${alertasHTML}
     <div class="stats">
       <div class="sc"><div class="sc-l">Pipeline total</div><div class="sc-v" style="color:var(--purple)">${fmt(tv)}</div><div class="sc-s">${deals.length} empresas</div></div>
       <div class="sc"><div class="sc-l">Weighted value</div><div class="sc-v">${fmt(Math.round(wv))}</div><div class="sc-s">por probabilidad</div></div>
