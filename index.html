@@ -324,6 +324,25 @@ function fmtDate(d){ if(!d)return'—'; return new Date(d+'T12:00:00').toLocaleD
 function fmtDateTime(d){ if(!d)return'—'; const dt=new Date(d); return dt.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'}); }
 function toast(msg,ok=true){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'; t.style.background=ok?'#2C2C2A':'#A32D2D'; setTimeout(()=>t.className='toast',2500); }
 
+// Días en el stage actual — umbral por etapa
+const STAGE_LIMITS = { Prospecting:14, Discovery:14, Proposal:10, Negotiation:10, 'Verbal Commit':7, WON:999, LOST:999 };
+function diasEnStage(d){
+  const desde = d.stage_since || d.created_at;
+  if(!desde) return null;
+  return Math.floor((new Date() - new Date(desde)) / (1000*60*60*24));
+}
+function stageDaysLabel(d){
+  if(['WON','LOST'].includes(d.stage)) return '';
+  const dias = diasEnStage(d);
+  if(dias===null) return '';
+  const limite = STAGE_LIMITS[d.stage] || 14;
+  const isRed = dias >= limite;
+  const color = isRed ? '#A32D2D' : '#9E9D99';
+  const bg = isRed ? '#FCEBEB' : '#F1EFE8';
+  const label = dias === 0 ? 'Hoy' : dias === 1 ? '1 día' : `${dias} días`;
+  return `<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:999px;background:${bg};color:${color};margin-top:4px;display:inline-block">⏱ ${label}</span>`;
+}
+
 async function loadData(){
   try {
     const [d,a,t,ac,n] = await Promise.all([
@@ -467,7 +486,10 @@ function renderPipeline(deals){
           ${d.valor>0?`<div class="deal-v">${fmt(d.valor)}${d.probabilidad?' · '+d.probabilidad+'%':''}</div>`:''}
           <div class="deal-c">${d.empresas?.contacto||''}</div>
           ${d.siguiente_paso?`<div class="deal-c" style="color:var(--text-2)">${d.siguiente_paso.substring(0,40)}</div>`:''}
-          <span class="badge ${SBADGE[d.stage]}" style="margin-top:5px">${SLABELS[d.stage]}</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px">
+            <span class="badge ${SBADGE[d.stage]}">${SLABELS[d.stage]}</span>
+            ${stageDaysLabel(d)}
+          </div>
         </div>`).join('')}
     </div>`).join('');
 
@@ -623,11 +645,15 @@ async function saveDeal(){
     if(editingDealId){
       const d=DB.deals.find(x=>x.id===editingDealId);
       await sb.from('empresas').update({nombre:empresa,contacto,industria}).eq('id',d.empresa_id);
-      await sb.from('deals').update({servicio,stage,agente_id,valor,probabilidad,siguiente_paso,fecha_primer_contacto,fecha_cierre_estimada}).eq('id',editingDealId);
+      // Si cambió de stage, resetear stage_since
+      const stageChanged = d.stage !== stage;
+      const updatePayload = {servicio,stage,agente_id,valor,probabilidad,siguiente_paso,fecha_primer_contacto,fecha_cierre_estimada};
+      if(stageChanged) updatePayload.stage_since = new Date().toISOString();
+      await sb.from('deals').update(updatePayload).eq('id',editingDealId);
       toast('Deal actualizado');
     } else {
       const {data:emp}=await sb.from('empresas').insert({nombre:empresa,contacto,industria}).select().single();
-      await sb.from('deals').insert({empresa_id:emp.id,agente_id,servicio,stage,valor,probabilidad,siguiente_paso,fecha_primer_contacto,fecha_cierre_estimada});
+      await sb.from('deals').insert({empresa_id:emp.id,agente_id,servicio,stage,valor,probabilidad,siguiente_paso,fecha_primer_contacto,fecha_cierre_estimada,stage_since:new Date().toISOString()});
       toast('Deal creado');
     }
     closeModal('deal-modal'); await loadData();
@@ -742,7 +768,7 @@ function openDealDetail(id){
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
           <div><div class="detail-label">Contacto</div><div class="detail-val">${d.empresas?.contacto||'—'}</div></div>
           <div><div class="detail-label">Servicio</div><div class="detail-val">${d.servicio||'—'}</div></div>
-          <div><div class="detail-label">Stage</div><div><span class="badge ${SBADGE[d.stage]}">${SLABELS[d.stage]}</span></div></div>
+          <div><div class="detail-label">Stage</div><div style="display:flex;align-items:center;gap:6px"><span class="badge ${SBADGE[d.stage]}">${SLABELS[d.stage]}</span>${stageDaysLabel(d)}</div></div>
           <div><div class="detail-label">Agente</div><div class="detail-val">${ag?.nombre||''} ${ag?.apellido||''}</div></div>
           <div><div class="detail-label">Valor</div><div class="detail-val" style="font-weight:600;color:var(--amber)">${fmt(d.valor)}</div></div>
           <div><div class="detail-label">Probabilidad</div><div class="detail-val">${d.probabilidad||0}%</div></div>
